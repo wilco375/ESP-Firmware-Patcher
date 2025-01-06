@@ -121,13 +121,14 @@ def main():
     firmware_bin = read_firmware(firmware_file)
     patched_bin = patch_binary(firmware_bin)
 
-    partition_table_offset = locate_partition_table(patched_bin)
+    if '--skip-checksum-correct' not in sys.argv:
+        partition_table_offset = locate_partition_table(patched_bin)
 
-    partition_table = load_partition_table(patched_bin, partition_table_offset)
+        partition_table = load_partition_table(patched_bin, partition_table_offset)
 
-    for partition in partition_table:
-        if partition.type == esp32part.APP_TYPE:
-            patched_bin = process_partition(patched_bin, partition)
+        for partition in partition_table:
+            if partition.type == esp32part.APP_TYPE:
+                patched_bin = process_partition(patched_bin, partition)
 
     if patched_bin != firmware_bin:
         write_patched_firmware(firmware_file, patched_bin)
